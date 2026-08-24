@@ -869,8 +869,7 @@ export async function GET() {
       );
     }
 
-    // 홈페이지/상세 API 어디에서 왔든 실제 "출발" 상태가 확정된 편은 제외한다.
-    flights = removeDepartedFlights(flights);
+    // "출발" 상태도 브라우저에 전달한다. 클라이언트가 최초 관측 후 5분 동안 표시한 뒤 제거한다.
 
     flights.sort(
       (a, b) =>
@@ -939,7 +938,7 @@ export async function GET() {
         );
       }
 
-      flights = removeDepartedFlights(flights);
+      // fallback에서도 "출발" 상태를 전달해 동일한 5분 유예 표시를 적용한다.
       flights.sort(
         (a, b) =>
           sortKey(a.scheduleDateTime) - sortKey(b.scheduleDateTime) ||
