@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Patch FIDS source
-        shell: python
+        shell: python {0}
         run: |
           from pathlib import Path
 
@@ -68,10 +68,10 @@ jobs:
           route_path = Path('app/api/departures/route.ts')
           route = route_path.read_text(encoding='utf-8')
           route_replacements = [
-              ('// 최대 2페이지(페이지당 15편) 운용을 목표로 향후 운항편을 보강한다.\n// 화면에는 터미널별 최대 30개 실제 운항까지만 유지한다.\nconst DISPLAY_HORIZON_MINUTES = 8 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 30;', '// 최대 4페이지(페이지당 15편) 운용을 목표로 향후 운항편을 보강한다.\n// T1/T2 각각 최대 60개 실제 운항을 유지해 카테고리별 4페이지를 독립적으로 구성한다.\nconst DISPLAY_HORIZON_MINUTES = 12 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 60;\nconst DEPARTED_GRACE_MS = 5 * 60 * 1000;'),
-              (' * 최대 2페이지 분량을 안정적으로 확보하기 위한 미래편은 상세 OpenAPI에서 보강한다.\n * 8시간 범위가 자정을 넘으면 오늘/내일 2개 요청으로 분리한다.', ' * 최대 4페이지 분량을 안정적으로 확보하기 위한 미래편은 상세 OpenAPI에서 보강한다.\n * 12시간 범위가 자정을 넘으면 오늘/내일 2개 요청으로 분리한다.'),
+              ('// 최대 2페이지(페이지당 15편) 운용을 목표로 향후 운항편을 보강한다.\n// 화면에는 터미널별 최대 30개 실제 운항까지만 유지한다.\nconst DISPLAY_HORIZON_MINUTES = 8 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 30;', '// 최대 4페이지(페이지당 15편) 운용을 목표로 향후 운항편을 보강한다.\n// T1/T2 각각 최대 60개 실제 운항을 유지해 카테고리별 4페이지를 독립적으로 구성한다.\nconst DISPLAY_HORIZON_MINUTES = 24 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 60;\nconst DEPARTED_GRACE_MS = 5 * 60 * 1000;'),
+              (' * 최대 2페이지 분량을 안정적으로 확보하기 위한 미래편은 상세 OpenAPI에서 보강한다.\n * 8시간 범위가 자정을 넘으면 오늘/내일 2개 요청으로 분리한다.', ' * 최대 4페이지 분량을 안정적으로 확보하기 위한 미래편은 상세 OpenAPI에서 보강한다.\n * 최대 24시간 범위가 자정을 넘으면 오늘/내일 2개 요청으로 분리한다.'),
               (' * 각 터미널별 첫 30개 실제 운항 묶음을 남긴다.\n * PAGE_SIZE=15 기준 T1/T2 각각 최대 2페이지 분량이며,', ' * 각 터미널별 첫 60개 실제 운항 묶음을 남긴다.\n * PAGE_SIZE=15 기준 T1/T2 각각 최대 4페이지 분량이며,'),
-              ('// 홈페이지 피드 이후 시간대의 미래 운항편을 상세 API에서 보강하되 최대 2페이지 분량으로 제한한다.', '// 홈페이지 피드 이후 시간대의 미래 운항편을 상세 API에서 보강하되 카테고리별 최대 4페이지 분량으로 제한한다.'),
+              ('// 홈페이지 피드 이후 시간대의 미래 운항편을 상세 API에서 보강하되 최대 2페이지 분량으로 제한한다.', '// 홈페이지 피드 이후 시간대의 미래 운항편을 상세 API에서 보강해 카테고리별 최대 4페이지 분량을 확보한다.'),
               ('// 코드쉐어를 한 실제 운항으로 계산해 T1/T2 각각 최대 30운항(15편 × 2페이지)만 남긴다.', '// 코드쉐어를 한 실제 운항으로 계산해 T1/T2 각각 최대 60운항(15편 × 4페이지)만 남긴다.'),
           ]
           for old, new in route_replacements:
