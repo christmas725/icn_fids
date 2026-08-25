@@ -1,0 +1,140 @@
+name: Apply FIDS hotfix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fids-hotfix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Patch FIDS source
+        shell: python
+        run: |
+          from pathlib import Path
+
+          board_path = Path('components/FidsBoard.tsx')
+          board = board_path.read_text(encoding='utf-8')
+
+          replacements = [
+              ('const MAX_PAGES = 2;', 'const MAX_PAGES = 4;'),
+              ('const DEPARTED_CACHE_KEY = "icn-fids-departed-grace-v1";', 'const DEPARTED_CACHE_KEY = "icn-fids-departed-grace-v2";'),
+              ('firstSeenAt: next[key]?.firstSeenAt ?? observedAt,', 'firstSeenAt:\n                parseApiDateTime(flight.estimatedDateTime || flight.scheduleDateTime)?.getTime() ??\n                next[key]?.firstSeenAt ??\n                observedAt,'),
+              ('// FIDS 한 화면 운용은 최대 2페이지(15편 × 2 = 30개 실제 운항)로 제한한다.\n  // 코드쉐어 행은 groupCodeshareFlights에서 하나의 실제 운항으로 계산된다.', '// 각 카테고리는 최대 4페이지(15편 × 4 = 60개 실제 운항)까지 표시한다.\n  // 코드쉐어 행은 groupCodeshareFlights에서 하나의 실제 운항으로 계산된다.'),
+          ]
+          for old, new in replacements:
+              if old not in board:
+                  raise SystemExit(f'FidsBoard patch marker not found: {old[:80]!r}')
+              board = board.replace(old, new, 1)
+
+          old_filter = '''      if (isDepartedStatus(flight.remark)) {
+        const entry = departedCache[flightRetentionKey(flight)];
+        // 방금 응답에서 처음 관측된 출발편은 캐시 state가 반영되기 전에도 표시한다.
+        if (entry && current - entry.firstSeenAt >= DEPARTED_GRACE_MS) return false;
+      }
+'''
+          new_filter = '''      if (isDepartedStatus(flight.remark)) {
+        // "브라우저가 처음 본 시각"이 아니라 공항이 제공한 변경 출발시각을 기준으로
+        // 5분까지만 표시한다. 새로 접속/새로고침해도 오래된 출발편이 부활하지 않는다.
+        const actualDeparture = parseApiDateTime(
+          flight.estimatedDateTime || flight.scheduleDateTime
+        )?.getTime();
+        if (
+          actualDeparture !== undefined &&
+          Number.isFinite(actualDeparture) &&
+          current >= actualDeparture + DEPARTED_GRACE_MS
+        ) {
+          return false;
+        }
+
+        const entry = departedCache[flightRetentionKey(flight)];
+        if (entry && current - entry.firstSeenAt >= DEPARTED_GRACE_MS) return false;
+      }
+'''
+          if old_filter not in board:
+              raise SystemExit('FidsBoard departed filter marker not found')
+          board = board.replace(old_filter, new_filter, 1)
+          board_path.write_text(board, encoding='utf-8')
+
+          route_path = Path('app/api/departures/route.ts')
+          route = route_path.read_text(encoding='utf-8')
+          route_replacements = [
+              ('// 최대 2페이지(페이지당 15편) 운용을 목표로 향후 운항편을 보강한다.\n// 화면에는 터미널별 최대 30개 실제 운항까지만 유지한다.\nconst DISPLAY_HORIZON_MINUTES = 8 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 30;', '// 최대 4페이지(페이지당 15편) 운용을 목표로 향후 운항편을 보강한다.\n// T1/T2 각각 최대 60개 실제 운항을 유지해 카테고리별 4페이지를 독립적으로 구성한다.\nconst DISPLAY_HORIZON_MINUTES = 12 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 60;\nconst DEPARTED_GRACE_MS = 5 * 60 * 1000;'),
+              (' * 최대 2페이지 분량을 안정적으로 확보하기 위한 미래편은 상세 OpenAPI에서 보강한다.\n * 8시간 범위가 자정을 넘으면 오늘/내일 2개 요청으로 분리한다.', ' * 최대 4페이지 분량을 안정적으로 확보하기 위한 미래편은 상세 OpenAPI에서 보강한다.\n * 12시간 범위가 자정을 넘으면 오늘/내일 2개 요청으로 분리한다.'),
+              (' * 각 터미널별 첫 30개 실제 운항 묶음을 남긴다.\n * PAGE_SIZE=15 기준 T1/T2 각각 최대 2페이지 분량이며,', ' * 각 터미널별 첫 60개 실제 운항 묶음을 남긴다.\n * PAGE_SIZE=15 기준 T1/T2 각각 최대 4페이지 분량이며,'),
+              ('// 홈페이지 피드 이후 시간대의 미래 운항편을 상세 API에서 보강하되 최대 2페이지 분량으로 제한한다.', '// 홈페이지 피드 이후 시간대의 미래 운항편을 상세 API에서 보강하되 카테고리별 최대 4페이지 분량으로 제한한다.'),
+              ('// 코드쉐어를 한 실제 운항으로 계산해 T1/T2 각각 최대 30운항(15편 × 2페이지)만 남긴다.', '// 코드쉐어를 한 실제 운항으로 계산해 T1/T2 각각 최대 60운항(15편 × 4페이지)만 남긴다.'),
+          ]
+          for old, new in route_replacements:
+              if old not in route:
+                  raise SystemExit(f'route patch marker not found: {old[:100]!r}')
+              route = route.replace(old, new, 1)
+
+          old_remove = '''function removeDepartedFlights(flights: DepartureFlight[]) {
+  return flights.filter((flight) => !isDepartedRemark(flight.remark));
+}
+'''
+          new_remove = '''function removeDepartedFlights(flights: DepartureFlight[], now = Date.now()) {
+  return flights.filter((flight) => {
+    if (!isDepartedRemark(flight.remark)) return true;
+
+    // airport.kr의 변경 출발시각(없으면 예정시각)을 실제 표출 기준으로 사용한다.
+    // "출발" 상태는 그 시각부터 5분까지만 남고 이후 서버 응답에서 제거된다.
+    const departureAt = flightEpoch(
+      flight.estimatedDateTime || flight.scheduleDateTime
+    );
+    if (!Number.isFinite(departureAt)) return false;
+    return now < departureAt + DEPARTED_GRACE_MS;
+  });
+}
+'''
+          if old_remove not in route:
+              raise SystemExit('route removeDepartedFlights marker not found')
+          route = route.replace(old_remove, new_remove, 1)
+
+          main_marker = '''    // "출발" 상태도 브라우저에 전달한다. 클라이언트가 최초 관측 후 5분 동안 표시한 뒤 제거한다.
+
+    flights.sort(
+'''
+          main_new = '''    // "출발" 상태는 공항의 변경 출발시각 기준 5분까지만 서버 응답에 남긴다.
+    flights = removeDepartedFlights(flights);
+
+    flights.sort(
+'''
+          if main_marker not in route:
+              raise SystemExit('route main departed marker not found')
+          route = route.replace(main_marker, main_new, 1)
+
+          fallback_marker = '''      // fallback에서도 "출발" 상태를 전달해 동일한 5분 유예 표시를 적용한다.
+      flights.sort(
+'''
+          fallback_new = '''      // fallback에서도 변경 출발시각 기준 5분이 지난 "출발" 편은 제거한다.
+      flights = removeDepartedFlights(flights);
+      flights.sort(
+'''
+          if fallback_marker not in route:
+              raise SystemExit('route fallback departed marker not found')
+          route = route.replace(fallback_marker, fallback_new, 1)
+
+          route_path.write_text(route, encoding='utf-8')
+
+      - name: Commit hotfix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add components/FidsBoard.tsx app/api/departures/route.ts
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "fix: enforce departure grace and restore four pages"
+          git push origin HEAD:main
