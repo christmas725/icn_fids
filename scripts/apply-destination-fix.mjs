@@ -42,6 +42,13 @@ function patchAirportNames() {
 
   text = replaceOnce(
     text,
+    '  UBN: "ULAANBAATAR",',
+    '  UBN: "NEW ULAANBAATAR",',
+    "UBN canonical english name"
+  );
+
+  text = replaceOnce(
+    text,
     '  // 아직 사전에 없는 신규 취항지는 코드라도 틀리지 않게 표시한다.\n  return code || koreanName || "-";',
     '  // 신규 취항지가 사전에 없더라도 3자리 IATA 코드만 목적지명으로 표시하지 않는다.\n  // 번역 데이터가 아직 없으면 원본 공항명을 유지하고, IATA 코드는 별도 보조 줄에만 표시한다.\n  return koreanName || "-";',
     "english destination fallback"
@@ -120,6 +127,21 @@ function patchDestinationLocales() {
   fs.writeFileSync(path, text);
 }
 
+function patchBoardDestinationConsistency() {
+  const path = "components/FidsBoard.tsx";
+  let text = fs.readFileSync(path, "utf8");
+
+  text = replaceOnce(
+    text,
+    `              const englishDestination =\n                flight.airportEnglish ||\n                destinationName(flight.airportCode, flight.airport, "EN");`,
+    `              const englishDestination =\n                flight.airportCode.trim().toUpperCase() === "UBN"\n                  ? "NEW ULAANBAATAR"\n                  : flight.airportEnglish ||\n                    destinationName(flight.airportCode, flight.airport, "EN");`,
+    "UBN board english normalization"
+  );
+
+  fs.writeFileSync(path, text);
+}
+
 patchAirportNames();
 patchDestinationLocales();
+patchBoardDestinationConsistency();
 console.log("ICN FIDS destination language fix applied");
