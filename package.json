@@ -3,9 +3,9 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "predev": "node scripts/apply-v02-display-fix.mjs && node scripts/apply-destination-fix.mjs",
+    "predev": "node scripts/apply-v02-display-fix.mjs && node scripts/apply-destination-fix.mjs && node scripts/apply-mobile-destination-scroll.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/apply-v02-display-fix.mjs && node scripts/apply-destination-fix.mjs",
+    "prebuild": "node scripts/apply-v02-display-fix.mjs && node scripts/apply-destination-fix.mjs && node scripts/apply-mobile-destination-scroll.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
