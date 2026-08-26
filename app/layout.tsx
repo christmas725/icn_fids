@@ -3,6 +3,7 @@ import PwaRegister from "@/components/PwaRegister";
 import "./globals.css";
 import "./mobile.css";
 import "./foldable.css";
+import "./destination-scroll.css";
 
 export const metadata: Metadata = {
   title: "ICN FIDS v0.2",
