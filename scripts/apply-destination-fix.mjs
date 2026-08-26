@@ -40,11 +40,66 @@ function patchAirportNames() {
     "Philippines english names"
   );
 
+  // airport.kr 영문 출발 피드에서 실제 사용하는 표기를 fallback 사전에도 맞춘다.
   text = replaceOnce(
     text,
     '  UBN: "ULAANBAATAR",',
     '  UBN: "NEW ULAANBAATAR",',
-    "UBN canonical english name"
+    "UBN airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  SGN: "HO CHI MINH CITY",',
+    '  SGN: "HO CHI MINH",',
+    "SGN airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  DAD: "DA NANG",',
+    '  DAD: "DANANG",',
+    "DAD airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  CXR: "NHA TRANG/CAM RANH",',
+    '  CXR: "NHA TRANG",',
+    "CXR airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  NGO: "NAGOYA/CHUBU",',
+    '  NGO: "NAGOYA",',
+    "NGO airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  CTS: "SAPPORO/NEW CHITOSE",',
+    '  CTS: "SAPPORO",',
+    "CTS airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  KIX: "OSAKA/KANSAI",',
+    '  KIX: "OSAKA/ KANSAI",',
+    "KIX airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  SEA: "SEATTLE",',
+    '  SEA: "SEATTLE/TACOMA",',
+    "SEA airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  PUS: "BUSAN/GIMHAE",',
+    '  PUS: "BUSAN/GIMHAE",\n  TAE: "DAEGU",',
+    "TAE airport.kr name"
+  );
+  text = replaceOnce(
+    text,
+    '  LAS: "LAS VEGAS",',
+    '  LAS: "LAS VEGAS",\n  SLC: "SALT LAKE CITY",',
+    "SLC airport.kr name"
   );
 
   text = replaceOnce(
@@ -127,21 +182,6 @@ function patchDestinationLocales() {
   fs.writeFileSync(path, text);
 }
 
-function patchBoardDestinationConsistency() {
-  const path = "components/FidsBoard.tsx";
-  let text = fs.readFileSync(path, "utf8");
-
-  text = replaceOnce(
-    text,
-    `              const englishDestination =\n                flight.airportEnglish ||\n                destinationName(flight.airportCode, flight.airport, "EN");`,
-    `              const englishDestination =\n                flight.airportCode.trim().toUpperCase() === "UBN"\n                  ? "NEW ULAANBAATAR"\n                  : flight.airportEnglish ||\n                    destinationName(flight.airportCode, flight.airport, "EN");`,
-    "UBN board english normalization"
-  );
-
-  fs.writeFileSync(path, text);
-}
-
 patchAirportNames();
 patchDestinationLocales();
-patchBoardDestinationConsistency();
 console.log("ICN FIDS destination language fix applied");
