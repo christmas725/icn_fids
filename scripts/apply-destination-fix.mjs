@@ -15,7 +15,7 @@ function patchAirportNames() {
   text = replaceOnce(
     text,
     '  UBJ: "YAMAGUCHI/UBE",',
-    '  UBJ: "YAMAGUCHI/UBE",\n  ISG: "ISHIGAKI",\n  KMI: "MIYAZAKI",\n  OKJ: "OKAYAMA",\n  SHI: "MIYAKOJIMA/SHIMOJISHIMA",',
+    '  UBJ: "YAMAGUCHI/UBE",\n  ISG: "ISHIGAKIJIMA",\n  KMI: "MIYAZAKI",\n  OKJ: "OKAYAMA",\n  SHI: "MIYAKOJIMA/SHIMOJISHIMA",',
     "Japan english names"
   );
 
@@ -154,7 +154,7 @@ function patchDestinationLocales() {
   text = replaceOnce(
     text,
     'TKS:"徳島", UBJ:"山口宇部",',
-    'TKS:"徳島", UBJ:"山口宇部", ISG:"石垣", KMI:"宮崎", OKJ:"岡山", SHI:"宮古島/下地島",',
+    'TKS:"徳島", UBJ:"山口宇部", ISG:"石垣島", KMI:"宮崎", OKJ:"岡山", SHI:"宮古島/下地島",',
     "Japan local names"
   );
 
