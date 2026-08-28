@@ -15,8 +15,8 @@ function patchAirportNames() {
   text = replaceOnce(
     text,
     '  UBJ: "YAMAGUCHI/UBE",',
-    '  UBJ: "YAMAGUCHI/UBE",\n  SHI: "MIYAKOJIMA/SHIMOJISHIMA",',
-    "SHI english name"
+    '  UBJ: "YAMAGUCHI/UBE",\n  ISG: "ISHIGAKI",\n  KMI: "MIYAZAKI",\n  OKJ: "OKAYAMA",\n  SHI: "MIYAKOJIMA/SHIMOJISHIMA",',
+    "Japan english names"
   );
 
   text = replaceOnce(
@@ -98,8 +98,8 @@ function patchAirportNames() {
   text = replaceOnce(
     text,
     '  LAS: "LAS VEGAS",',
-    '  LAS: "LAS VEGAS",\n  SLC: "SALT LAKE CITY",',
-    "SLC airport.kr name"
+    '  LAS: "LAS VEGAS",\n  SLC: "SALT LAKE CITY",\n  DTW: "DETROIT",',
+    "US airport.kr names"
   );
 
   text = replaceOnce(
@@ -119,8 +119,15 @@ function patchDestinationLocales() {
   text = replaceOnce(
     text,
     '"YGJ","TKS","UBJ"]);',
-    '"YGJ","TKS","UBJ","SHI"]);',
-    "SHI locale"
+    '"YGJ","TKS","UBJ","ISG","KMI","OKJ","SHI"]);',
+    "Japan locales"
+  );
+
+  text = replaceOnce(
+    text,
+    'assign("en", ["SIN","LHR","LGW","LAX","SFO","SEA","JFK","EWR","IAD","BOS","ORD","DFW","ATL","LAS","HNL","YVR","YYZ","SYD","MEL","BNE","AKL","GUM","SPN","ROR"]);',
+    'assign("en", ["SIN","LHR","LGW","LAX","SFO","SEA","JFK","EWR","IAD","BOS","ORD","DFW","ATL","LAS","DTW","HNL","YVR","YYZ","SYD","MEL","BNE","AKL","GUM","SPN","ROR"]);',
+    "DTW locale"
   );
 
   text = replaceOnce(
@@ -147,8 +154,8 @@ function patchDestinationLocales() {
   text = replaceOnce(
     text,
     'TKS:"徳島", UBJ:"山口宇部",',
-    'TKS:"徳島", UBJ:"山口宇部", SHI:"宮古島/下地島",',
-    "SHI local name"
+    'TKS:"徳島", UBJ:"山口宇部", ISG:"石垣", KMI:"宮崎", OKJ:"岡山", SHI:"宮古島/下地島",',
+    "Japan local names"
   );
 
   text = replaceOnce(
@@ -170,6 +177,13 @@ function patchDestinationLocales() {
     'MNL:"MAYNILA", CEB:"CEBU", CRK:"CLARK", TAG:"BOHOL/PANGLAO", CGK:',
     'MNL:"MAYNILA", CEB:"CEBU", CRK:"CLARK", TAG:"BOHOL/PANGLAO", KLO:"KALIBO", CGK:',
     "KLO local name"
+  );
+
+  text = replaceOnce(
+    text,
+    'LAX:"LOS ANGELES", SFO:"SAN FRANCISCO", SEA:"SEATTLE", JFK:',
+    'LAX:"LOS ANGELES", SFO:"SAN FRANCISCO", SEA:"SEATTLE", DTW:"DETROIT", JFK:',
+    "DTW local name"
   );
 
   text = replaceOnce(
