@@ -1,7 +1,7 @@
 /* Desktop viewport-height protection
  * Windows maximized browser / display scaling environments can have a much
  * shorter CSS viewport than the physical monitor resolution suggests.
- * Keep the full 15-row FIDS, footer and rail clock inside the visible viewport.
+ * Keep the full 14-row FIDS, footer and rail clock inside the visible viewport.
  */
 
 @media (min-width: 1101px) {
@@ -25,13 +25,13 @@
     min-height: 0;
   }
 
-  /* A non-empty page always contains 15 real/filler flight rows.
-   * Give each row exactly 1/15 of the remaining board height so intrinsic
+  /* A non-empty page always contains 14 real/filler flight rows.
+   * Give each row exactly 1/14 of the remaining board height so intrinsic
    * text/padding can never push the last rows below the browser viewport.
    */
   .rows > .flight-row {
-    height: calc(100% / 15);
-    flex: 0 0 calc(100% / 15);
+    height: calc(100% / 14);
+    flex: 0 0 calc(100% / 14);
     min-height: 0;
     overflow: hidden;
   }
