@@ -12,6 +12,7 @@ function patchBoard() {
   const path = "components/FidsBoard.tsx";
   let text = fs.readFileSync(path, "utf8");
 
+  text = replaceOnce(text, "const PAGE_SIZE = 15;", "const PAGE_SIZE = 14;", "board page size");
   text = replaceOnce(text, "const MAX_PAGES = 2;", "const MAX_PAGES = 4;", "board max pages");
   text = replaceOnce(
     text,
@@ -34,12 +35,18 @@ function patchBoard() {
   text = text
     .replace(
       "// FIDS 한 화면 운용은 최대 2페이지(15편 × 2 = 30개 실제 운항)로 제한한다.",
-      "// 각 카테고리는 최대 4페이지(15편 × 4 = 60개 실제 운항)까지 표시한다."
+      "// 각 카테고리는 최대 4페이지(14편 × 4 = 56개 실제 운항)까지 표시한다."
     )
     .replace(
       "// FIDS 한 화면 운용은 최대 4페이지(15편 × 4 = 60개 실제 운항)로 제한한다.",
-      "// 각 카테고리는 최대 4페이지(15편 × 4 = 60개 실제 운항)까지 표시한다."
-    );
+      "// 각 카테고리는 최대 4페이지(14편 × 4 = 56개 실제 운항)까지 표시한다."
+    )
+    .replace(
+      "// 각 카테고리는 최대 4페이지(15편 × 4 = 60개 실제 운항)까지 표시한다.",
+      "// 각 카테고리는 최대 4페이지(14편 × 4 = 56개 실제 운항)까지 표시한다."
+    )
+    .replace("마지막 페이지도 실제 FIDS처럼 항상 15행 높이를 유지한다.", "마지막 페이지도 실제 FIDS처럼 항상 14행 높이를 유지한다.")
+    .replace("실제 운항편이 부족한 만큼 빈 행을 채워 각 페이지의 행 크기가 동일하도록 한다.", "실제 운항편이 부족한 만큼 빈 행을 채워 각 페이지의 14행 크기가 동일하도록 한다.");
 
   fs.writeFileSync(path, text);
 }
@@ -49,7 +56,7 @@ function patchRoute() {
   let text = fs.readFileSync(path, "utf8");
 
   const oldConstants = `// 최대 2페이지(페이지당 15편) 운용을 목표로 향후 운항편을 보강한다.\n// 화면에는 터미널별 최대 30개 실제 운항까지만 유지한다.\nconst DISPLAY_HORIZON_MINUTES = 8 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 30;`;
-  const newConstants = `// 최대 4페이지(페이지당 15편) 운용을 목표로 향후 운항편을 보강한다.\n// T1/T2 각각 최대 60개 실제 운항을 확보해 전체/T1/T2 카테고리가\n// 독립적으로 마지막 페이지까지 순환할 수 있게 한다.\nconst DISPLAY_HORIZON_MINUTES = 24 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 60;\nconst DEPARTED_GRACE_MS = 5 * 60 * 1000;`;
+  const newConstants = `// 최대 4페이지(페이지당 14편) 운용을 목표로 향후 운항편을 보강한다.\n// T1/T2 각각 최대 56개 실제 운항을 확보해 전체/T1/T2 카테고리가\n// 독립적으로 마지막 페이지까지 순환할 수 있게 한다.\nconst DISPLAY_HORIZON_MINUTES = 24 * 60;\nconst TARGET_OPERATIONS_PER_TERMINAL = 56;\nconst DEPARTED_GRACE_MS = 5 * 60 * 1000;`;
   text = replaceOnce(text, oldConstants, newConstants, "route page constants");
 
   const oldRemove = `function removeDepartedFlights(flights: DepartureFlight[]) {\n  return flights.filter((flight) => !isDepartedRemark(flight.remark));\n}`;
@@ -67,10 +74,14 @@ function patchRoute() {
   text = text
     .replace("최대 2페이지 분량을 안정적으로 확보", "최대 4페이지 분량을 안정적으로 확보")
     .replace("8시간 범위가 자정을 넘으면", "24시간 범위가 자정을 넘으면")
-    .replace("각 터미널별 첫 30개 실제 운항 묶음", "각 터미널별 첫 60개 실제 운항 묶음")
+    .replace("각 터미널별 첫 30개 실제 운항 묶음", "각 터미널별 첫 56개 실제 운항 묶음")
+    .replace("각 터미널별 첫 60개 실제 운항 묶음", "각 터미널별 첫 56개 실제 운항 묶음")
     .replace("T1/T2 각각 최대 2페이지 분량", "T1/T2 각각 최대 4페이지 분량")
     .replace("미래 운항편을 상세 API에서 보강하되 최대 2페이지 분량으로 제한한다.", "미래 운항편을 상세 API에서 보강해 카테고리별 최대 4페이지 분량을 확보한다.")
-    .replace("T1/T2 각각 최대 30운항(15편 × 2페이지)", "T1/T2 각각 최대 60운항(15편 × 4페이지)");
+    .replace("T1/T2 각각 최대 30운항(15편 × 2페이지)", "T1/T2 각각 최대 56운항(14편 × 4페이지)")
+    .replace("T1/T2 각각 최대 60운항(15편 × 4페이지)", "T1/T2 각각 최대 56운항(14편 × 4페이지)")
+    .replace("페이지당 15편", "페이지당 14편")
+    .replace("최대 60개 실제 운항", "최대 56개 실제 운항");
 
   fs.writeFileSync(path, text);
 }
