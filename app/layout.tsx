@@ -4,6 +4,7 @@ import "./globals.css";
 import "./mobile.css";
 import "./foldable.css";
 import "./destination-scroll.css";
+import "./desktop-height.css";
 
 export const metadata: Metadata = {
   title: "ICN FIDS v0.2",
