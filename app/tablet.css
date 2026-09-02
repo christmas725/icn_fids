@@ -119,38 +119,38 @@
     font-size: clamp(8px, 1.05dvh, 10px);
   }
 
-  /* v0.2 now uses 14 rows per page. Keep all rows visible without scrolling. */
+  /* Large touch tablets use 16 rows per page to better use their taller board area. */
   .rows > .flight-row {
-    height: calc(100% / 14);
-    flex: 0 0 calc(100% / 14);
+    height: calc(100% / 16);
+    flex: 0 0 calc(100% / 16);
     min-height: 0;
     overflow: hidden;
   }
 
   .flight-row > div {
     min-height: 0;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    padding-top: 1px;
+    padding-bottom: 1px;
   }
 
   .time-cell strong {
-    font-size: clamp(20px, 2.75dvh, 26px);
+    font-size: clamp(19px, 2.55dvh, 25px);
   }
 
   .old-time {
     margin-bottom: 1px;
-    font-size: clamp(8px, 1.05dvh, 10px);
+    font-size: clamp(8px, 1dvh, 10px);
   }
 
   .carrier-logo-shell {
     width: clamp(34px, 3vw, 40px);
-    height: clamp(27px, 2.3vw, 32px);
+    height: clamp(26px, 2.2vw, 31px);
     padding: 2px 4px;
   }
 
   .carrier-mark {
     width: clamp(32px, 2.8vw, 38px);
-    height: clamp(26px, 2.2vw, 31px);
+    height: clamp(25px, 2.1vw, 30px);
   }
 
   .flight-cell {
@@ -159,25 +159,25 @@
 
   .flight-copy strong,
   .destination-cell strong {
-    font-size: clamp(14px, 2.05dvh, 19px);
+    font-size: clamp(14px, 1.9dvh, 18px);
   }
 
   .flight-copy span,
   .destination-cell span {
-    margin-top: 2px;
-    font-size: clamp(8px, 1.05dvh, 10px);
+    margin-top: 1px;
+    font-size: clamp(8px, 1dvh, 9.5px);
   }
 
   .counter-value {
-    font-size: clamp(12px, 1.7dvh, 16px);
+    font-size: clamp(12px, 1.6dvh, 15px);
   }
 
   .gate-value strong {
-    font-size: clamp(18px, 2.55dvh, 24px);
+    font-size: clamp(17px, 2.35dvh, 23px);
   }
 
   .gate-value span {
-    margin-top: 2px;
+    margin-top: 1px;
     padding: 1px 4px;
     font-size: 7px;
   }
@@ -186,10 +186,10 @@
   .status-chip[lang]:not([lang="ko"]):not([lang="en"]) {
     width: min(100%, 104px);
     min-width: 0;
-    padding: 4px 6px;
+    padding: 3px 6px;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: clamp(10px, 1.45dvh, 13px);
+    font-size: clamp(9.5px, 1.35dvh, 12.5px);
   }
 
   .board-footer {
@@ -205,7 +205,9 @@
 }
 
 /* Large-tablet portrait: the existing top-rail foldable layout is retained,
- * but use the extra screen real estate for slightly larger touch targets. */
+ * but use the extra screen real estate for slightly larger touch targets.
+ * Portrait widths <=1100px continue to use the normal 14-row pagination.
+ */
 @media (min-width: 800px) and (max-width: 1100px) and (orientation: portrait) and (hover: none),
        (min-width: 800px) and (max-width: 1100px) and (orientation: portrait) and (pointer: coarse) {
   .terminal-selector {
