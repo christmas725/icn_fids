@@ -1,7 +1,6 @@
 /* ICN FIDS v0.2 - large touch-tablet optimization
  * Phones/split-screen stay in mobile.css and 721-1100px touch layouts stay in foldable.css.
- * This range targets Galaxy Tab Ultra / large Android tablets whose landscape CSS width
- * exceeds 1100px and would otherwise fall into the desktop layout.
+ * Large tablets use 16 rows in landscape and 20 rows in portrait.
  */
 
 @media (min-width: 1101px) and (max-width: 1700px) and (hover: none),
@@ -119,7 +118,7 @@
     font-size: clamp(8px, 1.05dvh, 10px);
   }
 
-  /* Large touch tablets use 16 rows per page to better use their taller board area. */
+  /* Large touch tablets use 16 rows in landscape. */
   .rows > .flight-row {
     height: calc(100% / 16);
     flex: 0 0 calc(100% / 16);
@@ -204,45 +203,75 @@
   }
 }
 
-/* Large-tablet portrait also uses 16 rows.
- * The aspect-ratio guard keeps squarer unfolded foldables on their 14-row layout.
+/* Large-tablet portrait uses 20 rows.
+ * The aspect-ratio guard keeps unfolded foldables on their normal 14-row layout.
  */
 @media (min-width: 800px) and (max-width: 1100px) and (orientation: portrait) and (max-aspect-ratio: 3/4) and (hover: none),
        (min-width: 800px) and (max-width: 1100px) and (orientation: portrait) and (max-aspect-ratio: 3/4) and (pointer: coarse) {
   .terminal-selector {
-    min-height: 42px;
-    padding: 8px 12px;
+    min-height: 40px;
+    padding: 7px 11px;
   }
 
   .terminal-selector span {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .page-number {
-    padding: 6px 9px;
+    padding: 5px 8px;
   }
 
   .table-head {
-    height: 52px;
-    min-height: 52px;
+    height: 48px;
+    min-height: 48px;
   }
 
   .rows > .flight-row {
-    height: calc(100% / 16);
-    flex: 0 0 calc(100% / 16);
+    height: calc(100% / 20);
+    flex: 0 0 calc(100% / 20);
     min-height: 0;
     overflow: hidden;
   }
 
   .flight-row > div {
     min-height: 0;
-    padding-top: 1px;
-    padding-bottom: 1px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .time-cell strong {
+    font-size: clamp(16px, 2.05vw, 20px);
+  }
+
+  .flight-copy strong,
+  .destination-cell strong {
+    font-size: clamp(12px, 1.65vw, 15px);
+  }
+
+  .flight-copy span,
+  .destination-cell span {
+    margin-top: 1px;
+    font-size: 7.5px;
+  }
+
+  .counter-value {
+    font-size: clamp(10px, 1.35vw, 13px);
+  }
+
+  .gate-value strong {
+    font-size: clamp(15px, 1.95vw, 18px);
+  }
+
+  .status-chip,
+  .status-chip[lang]:not([lang="ko"]):not([lang="en"]) {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: clamp(8.5px, 1.15vw, 10.5px);
   }
 
   .board-footer {
-    height: 29px;
-    min-height: 29px;
+    height: 27px;
+    min-height: 27px;
   }
 }
 
